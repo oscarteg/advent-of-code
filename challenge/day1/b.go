@@ -17,6 +17,7 @@ func bCommand() *cobra.Command {
 		},
 	}
 }
+
 func b(challenge *challenge.Input) int {
 	var entries []int
 
@@ -24,5 +25,13 @@ func b(challenge *challenge.Input) int {
 		entries = append(entries, util.MustAtoI(v))
 	}
 
+	elementMap := util.SliceToMap(entries)
 
+	for element := range elementMap {
+		if secondElement, exists := elementMap[2020-element]; exists {
+			return element * secondElement
+		}
+	}
+
+	panic("There is no answer")
 }

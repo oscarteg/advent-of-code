@@ -27,9 +27,13 @@ func b(challenge *challenge.Input) int {
 
 	elementMap := util.SliceToMap(entries)
 
-	for element := range elementMap {
-		if secondElement, exists := elementMap[2020-element]; exists {
-			return element * secondElement
+
+	for index, element := range entries {
+		for j := index; j <= len(entries)-1; j++ {
+			sum := element + entries[j]
+			if missingElement, exists := elementMap[2020-sum]; exists {
+				return element * missingElement * entries[j]
+			}
 		}
 	}
 

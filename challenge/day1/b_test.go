@@ -12,5 +12,5 @@ func TestB(t *testing.T) {
 
 	result := b(input)
 
-	require.Equal(t, 514579, result)
+	require.Equal(t, 241861950, result)
 }

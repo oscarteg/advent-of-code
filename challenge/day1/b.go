@@ -2,6 +2,7 @@ package day1
 
 import (
 	"fmt"
+
 	"github.com/oscarteg/advent-of-code-2020/util"
 
 	"github.com/oscarteg/advent-of-code-2020/challenge"
@@ -26,7 +27,6 @@ func b(challenge *challenge.Input) int {
 	}
 
 	elementMap := util.SliceToMap(entries)
-
 
 	for index, element := range entries {
 		for j := index; j <= len(entries)-1; j++ {

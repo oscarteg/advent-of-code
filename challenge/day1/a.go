@@ -2,6 +2,7 @@ package day1
 
 import (
 	"fmt"
+
 	"github.com/oscarteg/advent-of-code-2020/util"
 
 	"github.com/oscarteg/advent-of-code-2020/challenge"
@@ -26,7 +27,7 @@ func a(challenge *challenge.Input) int {
 	}
 
 	for i := 0; i <= len(entries); i++ {
-		for j := i; j <= len(entries) - 1; j++ {
+		for j := i; j <= len(entries)-1; j++ {
 			sum := entries[i] + entries[j]
 			if sum == 2020 {
 				return entries[i] * entries[j]

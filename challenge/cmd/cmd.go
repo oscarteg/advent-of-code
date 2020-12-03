@@ -8,11 +8,13 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/oscarteg/advent-of-code-2020/challenge/day1"
+	"github.com/oscarteg/advent-of-code-2020/challenge/day2"
 	"github.com/oscarteg/advent-of-code-2020/challenge/example"
 )
 func addDays(root *cobra.Command) {
 	example.AddCommandsTo(root)
 	day1.AddCommandsTo(root)
+	day2.AddCommandsTo(root)
 }
 type prof interface {
 	Stop()
@@ -23,7 +25,7 @@ func NewRootCommand() *cobra.Command {
 		profiler prof
 	)
 	result := &cobra.Command{
-		Use:     "advent-of-code",
+		Use:     "advent-of-code-2020",
 		Short:   "Advent of Code 2020 Solutions",
 		Long:    "Golang implementations for the 2020 Advent of Code problems",
 		Example: "go run main.go 1 a -i ./challenge/day1/input.txt",

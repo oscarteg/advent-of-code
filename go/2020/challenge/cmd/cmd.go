@@ -27,6 +27,8 @@ import (
 	"github.com/oscarteg/advent-of-code-2020/challenge/day18"
 	"github.com/oscarteg/advent-of-code-2020/challenge/day19"
 	"github.com/oscarteg/advent-of-code-2020/challenge/day20"
+	"github.com/oscarteg/advent-of-code-2020/challenge/day21"
+	"github.com/oscarteg/advent-of-code-2020/challenge/day22"
 	"github.com/oscarteg/advent-of-code-2020/challenge/example"
 )
 func addDays(root *cobra.Command) {
@@ -51,6 +53,8 @@ func addDays(root *cobra.Command) {
 	day18.AddCommandsTo(root)
 	day19.AddCommandsTo(root)
 	day20.AddCommandsTo(root)
+	day21.AddCommandsTo(root)
+	day22.AddCommandsTo(root)
 }
 type prof interface {
 	Stop()

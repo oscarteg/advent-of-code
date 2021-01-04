@@ -1,4 +1,4 @@
-package day3
+package day25
 
 import (
 	"fmt"
@@ -10,13 +10,12 @@ import (
 func aCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "a",
-		Short: "Day 3, Problem A",
+		Short: "Day 25, Problem A",
 		Run: func(_ *cobra.Command, _ []string) {
 			fmt.Printf("Answer: %d\n", a(challenge.FromFile()))
 		},
 	}
 }
 func a(challenge *challenge.Input) int {
-	grid := challenge.ToGrid()
-	return grid.CountTreesInPath(3, 1)
+	return 0
 }

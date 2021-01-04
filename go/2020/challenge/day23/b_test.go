@@ -1,4 +1,4 @@
-package day3
+package day23
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestB(t *testing.T) {
-	input := challenge.FromLiteral(input)
+	input := challenge.FromLiteral("foobar")
 	result := b(input)
-	require.Equal(t, 336, result)
+	require.Equal(t, 42, result)
 }

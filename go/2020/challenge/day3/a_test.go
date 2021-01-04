@@ -7,8 +7,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var input = `..##.......
+#...#...#..
+.#....#..#.
+..#.#...#.#
+.#...##..#.
+..#.##.....
+.#.#.#....#
+.#........#
+#.##...#...
+#...##....#
+.#..#...#.#`
+
 func TestA(t *testing.T) {
-	input := challenge.FromLiteral("foobar")
+	input := challenge.FromLiteral(input)
+
 	result := a(input)
-	require.Equal(t, 42, result)
+	require.Equal(t, 7, result)
 }

@@ -1,10 +1,12 @@
 [package]
-name = "advent-of-code-2020"
+name = "advent-of-code"
 version = "0.1.0"
 authors = ["Oscar te Giffel <oscar@tegiffel.com>"]
 
+
 [lib]
-bench = false
+bench = true
+path = "src/lib.rs"
 
 [dependencies]
 rust-crypto = "0.2.36"

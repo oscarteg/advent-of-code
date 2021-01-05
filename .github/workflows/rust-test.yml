@@ -10,7 +10,7 @@ name: Rust testing
 
 defaults:
   run:
-    working-directory: rust
+    working-directory: ./rust
 
 jobs:
   check:

@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -63,6 +64,11 @@ func (c *Input) LinesSlice() (result []string) {
 	return
 }
 
+func (i *Input) ToPassports() (result []Passport)  {
+	fmt.Print(i.LinesSlice())
+	return
+}
+
 func (c *Input) ToGrid() *Grid {
 	lines := c.LinesSlice()
 
@@ -72,5 +78,3 @@ func (c *Input) ToGrid() *Grid {
 		height: len(lines),
 	}
 }
-
-

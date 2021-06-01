@@ -2,7 +2,6 @@ package day4
 
 import (
 	"fmt"
-
 	"github.com/oscarteg/advent-of-code-2020/challenge"
 	"github.com/spf13/cobra"
 )
@@ -17,5 +16,10 @@ func aCommand() *cobra.Command {
 	}
 }
 func a(challenge *challenge.Input) int {
-	return 0
+	var validPassports = 0
+
+
+	challenge.ToPassports()
+
+	return validPassports
 }

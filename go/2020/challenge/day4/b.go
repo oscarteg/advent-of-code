@@ -17,5 +17,6 @@ func bCommand() *cobra.Command {
 	}
 }
 func b(challenge *challenge.Input) int {
+
 	return 0
 }

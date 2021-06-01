@@ -80,9 +80,9 @@ pub fn input_generator(input: &str) -> Vec<OTCP> {
 */
 ///Your puzzle answer was
 /// ```
-/// use advent_of_code_2020::day_02::*;
+/// use advent_of_code::day2::{solve_part_01, input_generator};
 /// let input = include_str!("../input/2020/day2.txt");
-/// assert_eq!(solve_part_01(&input_generator(input)), 524);
+/// assert_eq!(solve_part_01(&input_generator(input)), 515);
 /// ```
 #[aoc(day2, part1)]
 pub fn solve_part_01(input: &[OTCP]) -> usize {
@@ -119,9 +119,9 @@ pub fn solve_part_01(input: &[OTCP]) -> usize {
 */
 ///your puzzle answer was
 /// ```
-/// use advent_of_code_2020::day_02::*;
+/// use advent_of_code::day2::{solve_part_02, input_generator};
 /// let input = include_str!("../input/2020/day2.txt");
-/// assert_eq!(solve_part_02(&input_generator(input)), 485);
+/// assert_eq!(solve_part_02(&input_generator(input)), 711);
 /// ```
 #[aoc(day2, part2)]
 pub fn solve_part_02(input: &[OTCP]) -> usize {

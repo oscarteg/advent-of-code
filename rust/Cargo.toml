@@ -2,6 +2,7 @@
 name = "advent-of-code"
 version = "0.1.0"
 authors = ["Oscar te Giffel <oscar@tegiffel.com>"]
+edition = "2018"
 
 
 [lib]

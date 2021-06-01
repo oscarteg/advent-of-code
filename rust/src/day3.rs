@@ -93,9 +93,9 @@ fn slope_finder(input: &[String], rs: &usize, cs: &usize) -> u32 {
 */
 ///your puzzle answer was.
 /// ```
-/// use advent_of_code_2020::day_03::*;
+/// use advent_of_code::day3::{solve_part_01, input_generator};
 /// let input = include_str!("../input/2020/day3.txt");
-/// assert_eq!(solve_part_01(&input_generator(input)), 259);
+/// assert_eq!(solve_part_01(&input_generator(input)), 225);
 /// ```
 #[aoc(day3, part1)]
 pub fn solve_part_01(input: &[String]) -> u32 {
@@ -122,9 +122,9 @@ pub fn solve_part_01(input: &[String]) -> u32 {
 */
 ///your puzzle answer was.
 /// ```
-/// use advent_of_code_2020::day_03::*;
+/// use advent_of_code::day3::{solve_part_02, input_generator};
 /// let input = include_str!("../input/2020/day3.txt");
-/// assert_eq!(solve_part_02(&input_generator(input)), 2224913600);
+/// assert_eq!(solve_part_02(&input_generator(input)), 1115775000);
 /// ```
 #[aoc(day3, part2)]
 pub fn solve_part_02(input: &[String]) -> u32 {

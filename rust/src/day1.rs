@@ -1,5 +1,5 @@
-use common;
 use std::collections::HashSet;
+use crate::common;
 
 // Day 1: Report Repair
 // A version of "Two Sum Problem"
@@ -39,9 +39,9 @@ pub fn input_generator(input: &str) -> HashSet<u32> {
 */
 /// Your puzzle answer was
 /// ```
-/// use advent_of_code_2020::day_01::*;
+/// use advent_of_code::day1::{solve_part_01, input_generator};
 /// let data = include_str!("../input/2020/day1.txt");
-/// assert_eq!(solve_part_01(&input_generator(data)), 898299);
+/// assert_eq!(solve_part_01(&input_generator(data)), 319531);
 /// ```
 #[aoc(day1, part1)]
 pub fn solve_part_01(input: &HashSet<u32>) -> u32 {
@@ -68,9 +68,9 @@ pub fn solve_part_01(input: &HashSet<u32>) -> u32 {
 */
 /// Your puzzle answer was
 /// ```
-/// use advent_of_code_2020::day_01::*;
+/// use advent_of_code::day1::{solve_part_02, input_generator};
 /// let data = include_str!("../input/2020/day1.txt");
-/// assert_eq!(solve_part_02(&input_generator(data)), 143933922);
+/// assert_eq!(solve_part_02(&input_generator(data)), 244300320);
 /// ```
 #[aoc(day1, part2)]
 pub fn solve_part_02(input: &HashSet<u32>) -> u32 {

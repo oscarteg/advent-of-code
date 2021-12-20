@@ -66,7 +66,6 @@ forward 2";
 
         let (x, y) = part_a(directions.iter());
 
-        println!("x: {}, y: {}, x + y = {}", x, y, x * y);
         assert_eq!(x * y, 150);
     }
 
@@ -81,7 +80,6 @@ forward 2";
 
         let (x, y) = part_a(directions.iter());
 
-        println!("x: {}, y: {}, x + y = {}", x, y, x * y);
         assert_eq!(x * y, 2039256);
     }
 
@@ -94,9 +92,6 @@ forward 2";
 
         let (x, y) = part_b(directions.iter());
 
-        println!("x: {}, y: {}, x + y = {}", x, y, x * y);
-        assert_eq!(x, 15);
-        assert_eq!(y, 60);
         assert_eq!(x * y, 900);
     }
 
@@ -111,7 +106,6 @@ forward 2";
 
         let (x, y) = part_b(directions.iter());
 
-        println!("x: {}, y: {}, x + y = {}", x, y, x * y);
         assert_eq!(x * y, 1856459736);
     }
 }

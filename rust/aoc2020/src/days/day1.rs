@@ -1,5 +1,4 @@
 use std::collections::HashSet;
-use crate::common;
 
 // Day 1: Report Repair
 // A version of "Two Sum Problem"
@@ -10,10 +9,6 @@ use crate::common;
 // using a HashSet which gets it down to O(n) and O(n^2) and it
 // could be seen in the performance testing.
 
-#[aoc_generator(day1)]
-pub fn input_generator(input: &str) -> HashSet<u32> {
-    common::input_hashset(input)
-}
 
 /* Part One
  *
@@ -37,13 +32,6 @@ pub fn input_generator(input: &str) -> HashSet<u32> {
  *
  * Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
 */
-/// Your puzzle answer was
-/// ```
-/// use advent_of_code::day1::{solve_part_01, input_generator};
-/// let data = include_str!("../input/2020/day1.txt");
-/// assert_eq!(solve_part_01(&input_generator(data)), 319531);
-/// ```
-#[aoc(day1, part1)]
 pub fn solve_part_01(input: &HashSet<u32>) -> u32 {
     for x in input {
         let y = 2020 - x;
@@ -66,13 +54,6 @@ pub fn solve_part_01(input: &HashSet<u32>) -> u32 {
  *
  * In your expense report, what is the product of the three entries that sum to 2020?
 */
-/// Your puzzle answer was
-/// ```
-/// use advent_of_code::day1::{solve_part_02, input_generator};
-/// let data = include_str!("../input/2020/day1.txt");
-/// assert_eq!(solve_part_02(&input_generator(data)), 244300320);
-/// ```
-#[aoc(day1, part2)]
 pub fn solve_part_02(input: &HashSet<u32>) -> u32 {
     for x in input {
         for y in input {
@@ -93,6 +74,7 @@ pub fn solve_part_02(input: &HashSet<u32>) -> u32 {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::input_hashset;
     use super::*;
 
     #[test]
@@ -106,7 +88,7 @@ mod tests {
 1456
 ";
 
-        assert_eq!(solve_part_01(&input_generator(data)), 514579)
+        assert_eq!(solve_part_01(&input_hashset(data)), 514579)
     }
 
     #[test]
@@ -120,6 +102,6 @@ mod tests {
 1456
 ";
 
-        assert_eq!(solve_part_02(&input_generator(data)), 241861950)
+        assert_eq!(solve_part_02(&input_hashset(data)), 241861950)
     }
 }

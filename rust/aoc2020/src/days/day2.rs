@@ -1,7 +1,7 @@
-use crate::common;
+use std::ops::RangeInclusive;
+
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::ops::RangeInclusive;
 
 // Day 2 - Password Philosophy
 //
@@ -40,11 +40,6 @@ fn parse(line: &str) -> Option<OTCP> {
     })
 }
 
-#[aoc_generator(day2)]
-pub fn input_generator(input: &str) -> Vec<OTCP> {
-    common::input_vec(input)
-}
-
 /* Part One
  *
  * Your flight departs in a few days from the coastal airport;
@@ -78,13 +73,6 @@ pub fn input_generator(input: &str) -> Vec<OTCP> {
  *
  * How many passwords are valid according to their policies?
 */
-///Your puzzle answer was
-/// ```
-/// use advent_of_code::day2::{solve_part_01, input_generator};
-/// let input = include_str!("../input/2020/day2.txt");
-/// assert_eq!(solve_part_01(&input_generator(input)), 515);
-/// ```
-#[aoc(day2, part1)]
 pub fn solve_part_01(input: &[OTCP]) -> usize {
     input
         .iter()
@@ -117,13 +105,6 @@ pub fn solve_part_01(input: &[OTCP]) -> usize {
  *
  * How many passwords are valid according to the new interpretation of the policies?
 */
-///your puzzle answer was
-/// ```
-/// use advent_of_code::day2::{solve_part_02, input_generator};
-/// let input = include_str!("../input/2020/day2.txt");
-/// assert_eq!(solve_part_02(&input_generator(input)), 711);
-/// ```
-#[aoc(day2, part2)]
 pub fn solve_part_02(input: &[OTCP]) -> usize {
     input
         .iter()
@@ -139,7 +120,7 @@ pub fn solve_part_02(input: &[OTCP]) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::utils::input_vec;
 
     /// Test example data on part 1
     #[test]
@@ -150,7 +131,7 @@ mod tests {
 2-9 c: ccccccccc
 ";
 
-        assert_eq!(solve_part_01(&input_generator(data)), 2)
+        assert_eq!(solve_part_01(&input_vec(data)), 2)
     }
 
     /// Test example data on part 2
@@ -162,6 +143,6 @@ mod tests {
 2-9 c: ccccccccc
 ";
 
-        assert_eq!(solve_part_02(&input_generator(data)), 1)
+        assert_eq!(solve_part_02(&input_vec(data)), 1)
     }
 }

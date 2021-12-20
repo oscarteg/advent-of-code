@@ -1,14 +1,11 @@
 [package]
-name = "advent_of_code"
+name = "aoc2020"
 version = "0.1.0"
 authors = ["Oscar te Giffel <oscar@tegiffel.com>"]
 edition = "2021"
 
-[workspace]
-members = [
-    "aoc2020",
-    "aoc2021"
-]
-
 [dependencies]
+rust-crypto = "0.2.36"
+regex = "1"
+lazy_static = "1.4"
 automod = "1.0.2"

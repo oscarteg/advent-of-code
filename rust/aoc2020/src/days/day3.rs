@@ -1,12 +1,4 @@
-use crate::common;
-
 // Day 3 - Toboggan Trajectory
-
-#[aoc_generator(day3)]
-pub fn input_generator(input: &str) -> Vec<String> {
-    common::input_vec(input)
-}
-
 fn slope_finder(input: &[String], rs: &usize, cs: &usize) -> u32 {
     let rows = input.len();
     let mut trees = 0;
@@ -91,13 +83,6 @@ fn slope_finder(input: &[String], rs: &usize, cs: &usize) -> u32 {
  *
  * Starting at the top-left corner of your map and following a slope of right 3 and down 1, how many trees would you encounter?
 */
-///your puzzle answer was.
-/// ```
-/// use advent_of_code::day3::{solve_part_01, input_generator};
-/// let input = include_str!("../input/2020/day3.txt");
-/// assert_eq!(solve_part_01(&input_generator(input)), 225);
-/// ```
-#[aoc(day3, part1)]
 pub fn solve_part_01(input: &[String]) -> u32 {
     slope_finder(input, &1, &3)
 }
@@ -120,13 +105,6 @@ pub fn solve_part_01(input: &[String]) -> u32 {
  *
  * What do you get if you multiply together the number of trees encountered on each of the listed slopes?
 */
-///your puzzle answer was.
-/// ```
-/// use advent_of_code::day3::{solve_part_02, input_generator};
-/// let input = include_str!("../input/2020/day3.txt");
-/// assert_eq!(solve_part_02(&input_generator(input)), 1115775000);
-/// ```
-#[aoc(day3, part2)]
 pub fn solve_part_02(input: &[String]) -> u32 {
     [(1, 1), (1, 3), (1, 5), (1, 7), (2, 1)]
         .iter()
@@ -135,6 +113,7 @@ pub fn solve_part_02(input: &[String]) -> u32 {
 
 #[cfg(test)]
 mod tests {
+    use crate::utils::input_vec;
     use super::*;
 
     /// Test example data on part 1
@@ -154,7 +133,7 @@ mod tests {
 .#..#...#.#
 ";
 
-        assert_eq!(solve_part_01(&input_generator(data)), 7)
+        assert_eq!(solve_part_01(&input_vec(data)), 7)
     }
 
     /// Test example data on part 2
@@ -174,6 +153,6 @@ mod tests {
 .#..#...#.#
     ";
 
-        assert_eq!(solve_part_02(&input_generator(data)), 336)
+        assert_eq!(solve_part_02(&input_vec(data)), 336)
     }
 }

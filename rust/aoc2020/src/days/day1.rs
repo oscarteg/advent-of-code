@@ -9,7 +9,6 @@ use std::collections::HashSet;
 // using a HashSet which gets it down to O(n) and O(n^2) and it
 // could be seen in the performance testing.
 
-
 /* Part One
  *
  * Before you leave, the Elves in accounting just need you to fix your
@@ -75,6 +74,7 @@ pub fn solve_part_02(input: &HashSet<u32>) -> u32 {
 #[cfg(test)]
 mod tests {
     use crate::utils::input_hashset;
+
     use super::*;
 
     #[test]

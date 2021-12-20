@@ -114,6 +114,7 @@ pub fn solve_part_02(input: &[String]) -> u32 {
 #[cfg(test)]
 mod tests {
     use crate::utils::input_vec;
+
     use super::*;
 
     /// Test example data on part 1

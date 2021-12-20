@@ -1,7 +1,8 @@
 pub fn solve_part_01(input: &[String]) -> u32 {
     println!("{:?}", input);
-    return 2224913600
+    return 2224913600;
 }
+
 pub fn solve_part_02(input: &[String]) -> u32 {
     return 2224913600;
 }
@@ -9,6 +10,7 @@ pub fn solve_part_02(input: &[String]) -> u32 {
 #[cfg(test)]
 mod tests {
     use crate::utils::{clean_input, input_vec};
+
     use super::*;
 
     /// Test example data on part 1

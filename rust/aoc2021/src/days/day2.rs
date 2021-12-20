@@ -28,6 +28,7 @@ pub fn part_a<'a>(directions: impl Iterator<Item = &'a Direction>) -> (u32, u32)
     let (x, y) = directions.fold((0, 0), |(x, y), dir| match dir {
         Direction::Forward(v) => (x + v, y),
         Direction::Down(v) => (x, y + v),
+        // saturating_sub makes sure you cant go past the minimum of 0
         Direction::Up(v) => (x, y.saturating_sub(*v)),
     });
     (x, y)

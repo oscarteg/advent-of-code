@@ -4,6 +4,7 @@ default:
   before_script:
     - rustc --version 
     - cargo --version
+    - cd rust
 
 stages:
   - test
@@ -11,7 +12,6 @@ stages:
 test-code:
   stage: test
   script:
-    - cd rust
     - cargo test
     - cargo install cargo-tarpaulin
     - cargo tarpaulin --ignore-tests

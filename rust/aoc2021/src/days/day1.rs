@@ -33,7 +33,7 @@ mod tests {
 
     #[test]
     fn test_sonar_sweep() {
-        let file = read_file("input/day1_b.txt");
+        let file = read_file("input/day1.txt");
         let input = clean_input(file.as_str());
 
         let vec = input.map(|l| l.parse::<u64>().unwrap());
@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_sonar_sweep_window() {
-        let file = read_file("input/day1_b.txt");
+        let file = read_file("input/day1.txt");
         let input = clean_input(file.as_str());
         let vec = input
             .map(|l| l.parse::<u64>().unwrap())

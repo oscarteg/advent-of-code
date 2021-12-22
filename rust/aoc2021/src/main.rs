@@ -15,14 +15,7 @@ pub mod utils {
         fs::read_to_string(filename).expect("File does not exist")
     }
 
-    /// Removes empty lines and is able to parse the string values into other types
-    // pub fn clean_input(input: &str) -> impl Iterator<Item=&str> {
-    //     input.lines().map(|l| l.trim())
-    //         // .map(|l| l.parse::<T>().unwrap())
-    //         .filter(|l| !l.is_empty())
-    // }
-
-    pub fn clean_input(input: &str) -> impl Iterator<Item = &str> + '_ {
+    pub fn clean_input(input: &str) -> impl Iterator<Item = &str> {
         input.lines().map(|l| l.trim()).filter(|l| !l.is_empty())
     }
 

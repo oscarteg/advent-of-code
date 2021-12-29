@@ -2,7 +2,6 @@ package challenge
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -61,11 +60,6 @@ func (c *Input) LinesSlice() (result []string) {
 		result = append(result, line)
 	}
 
-	return
-}
-
-func (i *Input) ToPassports() (result []Passport)  {
-	fmt.Print(i.LinesSlice())
 	return
 }
 

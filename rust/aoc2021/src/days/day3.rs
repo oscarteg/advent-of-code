@@ -2,86 +2,51 @@
 #![allow(unused_variables)]
 
 pub fn part_a<'a>(lines: Vec<&str>) -> (u32, u32, u32) {
-    let mut bits = Vec::<(i32, i32)>::new();
+    let max = (lines.len() + 1) / 2;
 
-    for line in lines {
-        line.chars().enumerate().for_each(|(i, b)| {
-            if i >= bits.len() {
-                bits.push((0, 0));
-            }
+    let bits = lines[0].len();
 
-            if b == '0' {
-                bits[i].0 += 1;
-            } else {
-                bits[i].1 += 1;
+    // To make sure we only perform operations on the bits we want.
+    let bitmask = (1 << bits) - 1;
+
+    // Bit shift gamma as required
+    let mut gamma = 0;
+
+    lines
+        .into_iter()
+        .fold(vec![0; bits], |count, reading| {
+            // Count all occurrences of 1 at each bit position within a reading
+            // It returns 1 array with an incremented value when 1 the bit position has value 1
+            count
+                .into_iter()
+                .enumerate()
+                .map(|(index, number)| {
+                    // Compare
+                    return if reading.as_bytes()[index] == b'1' {
+                        number + 1
+                    } else {
+                        number
+                    };
+                })
+                .collect()
+        })
+        .into_iter()
+        .enumerate()
+        .for_each(|(i, bit)| {
+            // If the number of bits is more than half of all lines than 1 occures more than 0
+            if bit >= max {
+                gamma += 1 << (bits - (i + 1))
             }
         });
-    }
 
-    let mut gamma = 0;
-    let mut epsilon = 0;
-    bits.iter().enumerate().for_each(|(i, (a, b))| {
-        if a < b {
-            gamma |= 1 << (bits.len() - i - 1)
-        }
-        if a > b {
-            epsilon |= 1 << (bits.len() - i - 1)
-        }
-    });
+    // let epsilon = !gamma & bitmask;
+    let epsilon = !gamma & bitmask;
 
     (gamma, epsilon, gamma * epsilon)
 }
 
 pub fn part_b(lines: Vec<&str>) -> (u32, u32, u32) {
-    let mut oxygen: u32 = 0;
-    let mut scrubber: u32 = 0;
-
-    let mut curr_oxygen = String::new();
-    let mut curr_scrubber = String::new();
-    let l = lines.first().unwrap_or(&"").len();
-    for i in 0..l {
-        let mut count = (0, 0);
-        for j in 0..lines.len() {
-            if !lines[j].starts_with(&curr_oxygen) {
-                continue;
-            }
-
-            if lines[j].chars().nth(i).unwrap() == '0' {
-                count.0 += 1;
-            } else {
-                count.1 += 1;
-            }
-        }
-
-        if count.0 <= count.1 {
-            oxygen |= 1 << (l - i - 1);
-            curr_oxygen += "1";
-        } else {
-            curr_oxygen += "0";
-        }
-
-        let mut count = (0, 0);
-        for j in 0..lines.len() {
-            if !lines[j].starts_with(&curr_scrubber) {
-                continue;
-            }
-
-            if lines[j].chars().nth(i).unwrap() == '0' {
-                count.0 += 1;
-            } else {
-                count.1 += 1;
-            }
-        }
-
-        if count.1 == 0 || (count.0 > 0 && count.0 <= count.1) {
-            curr_scrubber += "0";
-        } else {
-            scrubber |= 1 << (l - i - 1);
-            curr_scrubber += "1";
-        }
-    }
-
-    (oxygen, scrubber, oxygen * scrubber)
+    (0, 0, 0)
 }
 
 #[cfg(test)]

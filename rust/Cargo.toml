@@ -9,6 +9,3 @@ members = [
     "aoc2020",
     "aoc2021"
 ]
-
-[dependencies]
-automod = "1.0.2"

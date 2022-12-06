@@ -45,8 +45,59 @@ pub fn part_a<'a>(lines: Vec<&str>) -> (u32, u32, u32) {
     (gamma, epsilon, gamma * epsilon)
 }
 
-pub fn part_b(lines: Vec<&str>) -> (u32, u32, u32) {
-    (0, 0, 0)
+pub fn part_b(readings: Vec<&str>) -> (u32, u32, u32) {
+
+    let bits = readings[0].len();
+    let max = (lines.len() + 1) / 2;
+
+    let bits = lines[0].len();
+
+    // To make sure we only perform operations on the bits we want.
+    let bitmask = (1 << bits) - 1;
+
+    // Bit shift gamma as required
+    let mut gamma = 0;
+
+    let oxygen_rating = (0..bits)
+        .scan(readings.clone(), |oxygen, i| {
+            let max = (oxygen.len() as f32 / 2.0).ceil() as usize;
+
+            let mut sig = b'0';
+            let count = oxygen.iter()
+                .filter(|o| (**o).as_bytes()[i] == b'1')
+                .count();
+            if count >= max {
+                sig = b'1';
+            }
+
+            oxygen.drain_filter(|o| (*o).as_bytes()[i] != sig);
+            oxygen.first().copied()
+        })
+        .last()
+        .unwrap();
+
+    let co2_rating = (0..bits)
+        .scan(readings, |co2, i| {
+            let max = (co2.len() as f32 / 2.0).ceil() as usize;
+
+            let mut sig = b'1';
+            let count = co2.iter()
+                .filter(|c| (**c).as_bytes()[i] == b'1')
+                .count();
+            if count >= max {
+                sig = b'0';
+            }
+
+            co2.drain_filter(|c| (*c).as_bytes()[i] != sig);
+            co2.first().copied()
+        })
+        .last()
+        .unwrap();
+
+    let oxygen = usize::from_str_radix(oxygen_rating, 2).unwrap();
+    let co2 = usize::from_str_radix(co2_rating, 2).unwrap();
+
+    (oxygen as u32, co2 as u32, (oxygen * co2) as u32)
 }
 
 #[cfg(test)]
@@ -99,11 +150,11 @@ mod tests {
     fn test_part_b_example() {
         let input: Vec<&str> = clean_input(INPUT).collect();
 
-        let (gamma, epsilon, gamma_epsilon) = part_b(input);
+        let (oxygen, co2, oxygen_co2) = part_b(input);
 
-        assert_eq!(gamma, 23);
-        assert_eq!(epsilon, 10);
-        assert_eq!(gamma_epsilon, 230);
+        assert_eq!(oxygen, 23);
+        assert_eq!(co2, 10);
+        assert_eq!(oxygen_co2, 230);
     }
 
     #[test]
@@ -111,10 +162,10 @@ mod tests {
         let file = read_file("input/day3.txt");
         let input = clean_input(file.as_str()).collect();
 
-        let (gamma, epsilon, gamma_epsilon) = part_b(input);
+        let (oxygen, co2, oxygen_co2) = part_b(input);
 
-        assert_eq!(gamma, 2349);
-        assert_eq!(epsilon, 1190);
-        assert_eq!(gamma_epsilon, 2795310);
+        assert_eq!(oxygen, 2349);
+        assert_eq!(co2, 1190);
+        assert_eq!(oxygen_co2, 2795310);
     }
 }

@@ -1,15 +1,35 @@
-fn max_calorie_elf(input: &str) -> String {
-    let result = input
-        .split("\n\n")
-        .map(|l| {
-            l.lines()
-                .map(|item| item.parse::<u32>().unwrap())
-                .sum::<u32>()
-        })
-        .max()
-        .unwrap();
+fn part_one(input: &str) -> Option<i32> {
+    let elfs = input.split("\n\n");
 
-    result.to_string()
+    let mut max_calories = Some(0);
+    for elf in elfs {
+        let calories = elf
+            .split('\n')
+            .map(|food| food.parse::<i32>().unwrap_or(0))
+            .reduce(|a, b| a + b);
+        if calories.is_some() && calories > max_calories {
+            max_calories = calories;
+        }
+    }
+    max_calories
+}
+
+fn part_two(input: &str) -> Option<i32> {
+    let elfs = input.split("\n\n");
+
+    let mut calories_arr: Vec<i32> = vec![];
+    for elf in elfs {
+        let calories = elf
+            .split('\n')
+            .map(|food| food.parse::<i32>().unwrap_or(0))
+            .reduce(|a, b| a + b);
+        if calories.is_some() {
+            calories_arr.push(calories.unwrap_or(0))
+        }
+    }
+    calories_arr.sort_by(|a, b| b.cmp(a));
+    let result: i32 = calories_arr[0..3].iter().sum();
+    Some(result)
 }
 
 #[cfg(test)]
@@ -34,15 +54,16 @@ mod tests {
 10000";
 
     #[test]
-    pub fn part_1() {
-        let part_1 = max_calorie_elf(INPUT);
-        assert_eq!(part_1, "24000");
-
-        let file = read_file("input/day1.txt");
-        let part_2 = max_calorie_elf(file.as_str());
-        assert_eq!(part_2, "24000");
+    pub fn test_part_1() {
+        let file: String = read_file("input/day1.txt");
+        assert_eq!(part_one(INPUT), Some(24000));
+        assert_eq!(part_two(file.as_str()), Some(203905));
     }
 
     #[test]
-    fn part_2() {}
+    fn test_part_2() {
+        let file: String = read_file("input/day1.txt");
+        assert_eq!(part_two(INPUT), Some(45000));
+        assert_eq!(part_two(file.as_str()), Some(203905));
+    }
 }

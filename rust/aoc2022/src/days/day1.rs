@@ -1,4 +1,4 @@
-fn part_one(input: &str) -> Option<i32> {
+pub fn part_one(input: &str) -> Option<i32> {
     let elfs = input.split("\n\n");
 
     let mut max_calories = Some(0);
@@ -14,7 +14,7 @@ fn part_one(input: &str) -> Option<i32> {
     max_calories
 }
 
-fn part_two(input: &str) -> Option<i32> {
+pub fn part_two(input: &str) -> Option<i32> {
     let elfs = input.split("\n\n");
 
     let mut calories_arr: Vec<i32> = vec![];
@@ -57,7 +57,7 @@ mod tests {
     pub fn test_part_1() {
         let file: String = read_file("input/day1.txt");
         assert_eq!(part_one(INPUT), Some(24000));
-        assert_eq!(part_two(file.as_str()), Some(203905));
+        assert_eq!(part_one(file.as_str()), Some(70764));
     }
 
     #[test]

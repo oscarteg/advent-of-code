@@ -34,9 +34,7 @@ pub fn part_two(input: &str) -> Option<i32> {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::read_file;
-
-    use super::*;
+    use crate::{utils::read_file, days::day1::{part_one, part_two}};
 
     const INPUT: &str = "1000
 2000
@@ -55,15 +53,21 @@ mod tests {
 
     #[test]
     pub fn test_part_1() {
-        let file: String = read_file("input/day1.txt");
+        // Example
         assert_eq!(part_one(INPUT), Some(24000));
+
+        // Input
+        let file: String = read_file("input/day1.txt");
         assert_eq!(part_one(file.as_str()), Some(70764));
     }
 
     #[test]
     fn test_part_2() {
-        let file: String = read_file("input/day1.txt");
+        // Example
         assert_eq!(part_two(INPUT), Some(45000));
+
+        // Input
+        let file: String = read_file("input/day1.txt");
         assert_eq!(part_two(file.as_str()), Some(203905));
     }
 }

@@ -44,20 +44,51 @@ pub fn part_one(input: &str) -> Option<i32> {
             let a = moves.next().unwrap();
             let b = moves.next().unwrap();
 
+            println!("{:?} vs {:?}", a, b);
+
             match a.partial_cmp(&b) {
                 Some(Ordering::Greater) => b as i32,
-                Some(Ordering::Less) => 6 + b as i32,
                 Some(Ordering::Equal) => 3 + b as i32,
+                Some(Ordering::Less) => 6 + b as i32,
                 _ => panic!("Error for some reason"),
+            }
+        });
+
+
+    Some(result.sum())
+}
+
+pub fn part_two(input: &str) -> Option<i32> {
+    let result: i32 = input
+        .lines()
+        .map(|l| {
+            let mut moves = l.split_whitespace().map(|m| m.parse::<Move>().unwrap());
+            let a = moves.next().unwrap();
+            let b = moves.next().unwrap();
+
+            match b {
+                Move::Rock => {
+                    let our_move = match a {
+                        Move::Rock => Move::Scissors,
+                        Move::Paper => Move::Rock,
+                        Move::Scissors => Move::Paper,
+                    };
+                    our_move as i32
+                }
+                Move::Paper => 3 + a as i32,
+                Move::Scissors => {
+                    let our_move = match a {
+                        Move::Rock => Move::Paper,
+                        Move::Paper => Move::Scissors,
+                        Move::Scissors => Move::Rock,
+                    };
+                    6 + our_move as i32
+                }
             }
         })
         .sum();
 
     Some(result)
-}
-
-pub fn part_two(input: &str) -> Option<i32> {
-    None
 }
 
 #[cfg(test)]
@@ -66,8 +97,8 @@ mod tests {
 
     use super::*;
 
-    const INPUT: &str = "A X
-B Y
+    const INPUT: &str = "A Y
+B X
 C Z";
 
     #[test]
@@ -82,8 +113,11 @@ C Z";
 
     #[test]
     fn test_part_2() {
-        let file: String = read_file("input/day1.txt");
-        // assert_eq!(part_two(INPUT), Some(45000));
-        // assert_eq!(part_two(file.as_str()), Some(203905));
+        // Example
+        assert_eq!(part_two(INPUT), Some(12));
+
+        // Input
+        let file: String = read_file("input/day2.txt");
+        assert_eq!(part_two(file.as_str()), Some(12316));
     }
 }

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub fn part_one(input: &str) -> Option<u32> {
     let result = input.lines();
@@ -29,6 +29,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(sum)
 }
 
+/// Returns the priority of a character
 fn get_priority(c: char) -> u32 {
     // Check if the character is a lowercase letter
     if c.is_lowercase() {
@@ -39,8 +40,33 @@ fn get_priority(c: char) -> u32 {
     }
 }
 
-pub fn part_two(input: &str) -> Option<i32> {
-    Some(0)
+// Returns a hashmap of the priority of all possible characters
+fn all_priority() -> HashMap<char, usize> {
+    ('a'..='z')
+        .chain('A'..='Z')
+        .enumerate()
+        .map(|(idx, c)| (c, idx + 1))
+        .collect::<HashMap<char, usize>>()
+}
+
+pub fn part_two(input: &str) -> Option<u32> {
+    let result = input.lines();
+    let mut sum: u32 = 0;
+
+    // Split the result in multiple groups of 3 lines
+    for rucksack in result.collect::<Vec<&str>>().chunks(3) {
+        // Create hashmap for each rucksack
+        let mut counts = HashSet::new();
+
+        rucksack.iter().for_each(|x| counts.extend(x.chars()));
+        rucksack
+            .iter()
+            .for_each(|x| counts.retain(|y| x.contains(*y)));
+
+        sum += get_priority(*counts.iter().next().unwrap()) as u32;
+    }
+
+    Some(sum)
 }
 
 #[cfg(test)]
@@ -68,6 +94,11 @@ CrZsJsPPZsGzwwsLwLmpwMDw";
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part_two(INPUT), Some(0));
+        // Example
+        assert_eq!(part_two(INPUT), Some(70));
+
+        // Real input
+        let file: String = read_file("input/day3.txt");
+        assert_eq!(part_two(file.as_str()), Some(2790));
     }
 }

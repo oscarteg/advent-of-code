@@ -2,7 +2,7 @@ const std = @import("std");
 const testing = @import("std").testing;
 
 /// Reads an entire file into memory, caller owns the returned slice.
-pub fn slurp(allocator: std.mem.Allocator, file_path: []const u8) ![]u8 {
+pub fn read_file(allocator: std.mem.Allocator, file_path: []const u8) ![]u8 {
     var path_buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
     const path = try std.fs.realpath(file_path, &path_buffer);
 

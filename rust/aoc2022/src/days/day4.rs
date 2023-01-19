@@ -1,10 +1,9 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-// use nom::IResult;
-
 pub fn part_one(input: &str) -> Option<u32> {
     let mut out = 0;
+
     let foo = input
         .trim()
         .lines()
@@ -25,7 +24,18 @@ fn split_range(range: &str) -> (u32, u32) {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    Some(0)
+    let mut out = 0;
+    let foo = input
+        .trim()
+        .lines()
+        .map(|l| l.split_once(",").unwrap())
+        .map(|(a, b)| (split_range(a), split_range(b)));
+
+    for (x, y) in foo {
+        out += (x.0.max(y.0) <= x.1.min(y.1)) as u32;
+    }
+
+    Some(out)
 }
 
 #[cfg(test)]
@@ -54,10 +64,10 @@ mod tests {
     #[test]
     fn test_part_2() {
         // Example
-        // assert_eq!(part_two(INPUT), Some(70));
+        assert_eq!(part_two(INPUT), Some(4));
 
         // Real input
-        // let file: String = read_file("input/day3.txt");
-        // assert_eq!(part_two(file.as_str()), Some(2790));
+        let file: String = read_file("input/day4.txt");
+        assert_eq!(part_two(file.as_str()), Some(914));
     }
 }

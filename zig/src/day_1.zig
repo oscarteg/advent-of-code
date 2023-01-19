@@ -76,5 +76,5 @@ test "part_1_test" {
     const result = try puzzle_1(input);
     defer result.deinit(std.testing.allocator);
 
-    try testing.expectEqual(result, .{ .int = 538 });
+    try testing.expectEqual(result, .{ .int = 24000 });
 }

@@ -40,7 +40,7 @@ mod tests {
     #[case("zoneight234", 14)]
     #[case("7pqrstsixteen", 76)]
     fn line_test(#[case] line: &str, #[case] expected: u32) {
-        // assert_eq!(expected, process_line(line))
+        assert_eq!(expected, process_line(line))
     }
 
     #[test]

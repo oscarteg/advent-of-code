@@ -1,5 +1,6 @@
 use crate::custom_error::AocError;
 
+#[tracing::instrument]
 pub fn process_line(line: &str) -> u32 {
     let digits = line
         .chars()
@@ -32,13 +33,10 @@ mod tests {
     use rstest::rstest;
 
     #[rstest]
-    #[case("two1nine", 29)]
-    #[case("eightwothree", 83)]
-    #[case("abcone2threexyz", 13)]
-    #[case("xtwone3four", 24)]
-    #[case("4nineeightseven2", 42)]
-    #[case("zoneight234", 14)]
-    #[case("7pqrstsixteen", 76)]
+    #[case("1abc2", 12)]
+    #[case("pqr3stu8vwx", 38)]
+    #[case("a1b2c3d4e5f", 15)]
+    #[case("treb7uchet", 77)]
     fn line_test(#[case] line: &str, #[case] expected: u32) {
         assert_eq!(expected, process_line(line))
     }

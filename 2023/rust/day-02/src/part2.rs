@@ -1,6 +1,5 @@
-use std::{cmp, collections::HashMap, str::FromStr};
-
 use crate::custom_error::AocError;
+use std::{cmp, collections::HashMap, str::FromStr};
 
 #[derive(Debug, Eq, Hash, PartialEq)]
 enum Color {
@@ -17,7 +16,12 @@ impl FromStr for Color {
             "red" => Ok(Color::Red),
             "green" => Ok(Color::Green),
             "blue" => Ok(Color::Blue),
-            _ => unreachable!(),
+
+            _ => Err(AocError::ParseError {
+                input: s.to_string(),
+                source: s.to_string(), // if you have source code, replace with it
+                span: (0..s.len()).into(),
+            }),
         }
     }
 }
@@ -25,31 +29,26 @@ impl FromStr for Color {
 #[tracing::instrument]
 fn process_line(line: &str) -> u32 {
     let parts = line.split(": ").nth(1).unwrap().split("; ");
-    let mut min_cubes: HashMap<Color, u32> = HashMap::new();
 
-    for part in parts {
-        for p in part.split(", ") {
-            let x: Vec<&str> = p.split_whitespace().collect();
+    let min_cubes = parts.fold(HashMap::new(), |mut acc, part| {
+        part.split(", ").for_each(|p| {
+            let (number, color) = p.split_once(' ').unwrap();
+            let number = number.parse::<u32>().unwrap();
+            let color = color.parse::<Color>().unwrap();
 
-            let number = x[0].parse::<u32>().unwrap();
-            let color = x[1].parse::<Color>().unwrap();
+            acc.entry(color)
+                .and_modify(|e| *e = cmp::max(*e, number))
+                .or_insert(number);
+        });
+        acc
+    });
 
-            let current_min = min_cubes.entry(color).or_insert(number);
-
-            *current_min = cmp::max(*current_min, number);
-        }
-    }
-
-    min_cubes.values().product::<u32>()
+    min_cubes.values().product()
 }
 
 #[tracing::instrument]
 pub fn process(input: &str) -> miette::Result<String, AocError> {
-    let result = input.lines().fold(0, |acc, line| {
-        let result = process_line(line);
-
-        acc + result
-    });
+    let result = input.lines().map(process_line).sum::<u32>();
 
     Ok(result.to_string())
 }

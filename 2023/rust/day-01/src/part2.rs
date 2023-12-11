@@ -48,6 +48,7 @@ mod tests {
 
     use rstest::rstest;
 
+    #[tracing::instrument(level = "trace", skip(line, expected))]
     #[rstest]
     #[case("two1nine", 29)]
     #[case("eightwothree", 83)]

@@ -1,4 +1,5 @@
-use miette::{Diagnostic, SourceSpan};
+
+use miette::Diagnostic;
 use thiserror::Error;
 
 #[derive(Error, Diagnostic, Debug)]

@@ -17,11 +17,12 @@ impl FromStr for Color {
             "green" => Ok(Color::Green),
             "blue" => Ok(Color::Blue),
 
-            _ => Err(AocError::ParseError {
-                input: s.to_string(),
-                source: s.to_string(), // if you have source code, replace with it
-                span: (0..s.len()).into(),
-            }),
+            _ => Err(AocError::IoError(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("Failed to parse '{}' as a color", s),
+            ))),
+
+
         }
     }
 }

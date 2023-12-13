@@ -16,3 +16,6 @@ tracy-client = "0.16.4"
 tracy-client-sys = "0.22.0"
 miette = { version = "5.10", features = ["fancy"] }
 thiserror = "1.0.50"
+serde = "1.0.193"
+serde_json = "1.0.108"
+

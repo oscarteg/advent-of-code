@@ -120,6 +120,7 @@ pub fn solve_part_02(input: &[OTCP]) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::utils::input_vec;
 
     /// Test example data on part 1
@@ -146,3 +147,4 @@ mod tests {
         assert_eq!(solve_part_02(&input_vec(data)), 1)
     }
 }
+

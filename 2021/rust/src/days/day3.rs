@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
-pub fn part_a<'a>(lines: Vec<&str>) -> (u32, u32, u32) {
+pub fn part_a(lines: Vec<&str>) -> (u32, u32, u32) {
     let max = (lines.len() + 1) / 2;
 
     let bits = lines[0].len();
@@ -22,11 +22,11 @@ pub fn part_a<'a>(lines: Vec<&str>) -> (u32, u32, u32) {
                 .enumerate()
                 .map(|(index, number)| {
                     // Compare
-                    return if reading.as_bytes()[index] == b'1' {
+                    if reading.as_bytes()[index] == b'1' {
                         number + 1
                     } else {
                         number
-                    };
+                    }
                 })
                 .collect()
         })
@@ -45,59 +45,41 @@ pub fn part_a<'a>(lines: Vec<&str>) -> (u32, u32, u32) {
     (gamma, epsilon, gamma * epsilon)
 }
 
+fn find_rating<'a>(readings: &'a [&'a str], bits: usize, keep_most_common: bool) -> &'a str {
+    let mut candidates = readings.to_vec();
+
+    for i in 0..bits {
+        if candidates.len() == 1 {
+            break;
+        }
+
+        let ones_count = candidates
+            .iter()
+            .filter(|&&s| s.as_bytes()[i] == b'1')
+            .count();
+        let zeros_count = candidates.len() - ones_count;
+        let desired_bit = if (ones_count >= zeros_count) == keep_most_common {
+            b'1'
+        } else {
+            b'0'
+        };
+
+        candidates.retain(|&s| s.as_bytes()[i] == desired_bit);
+    }
+
+    candidates[0]
+}
+
 pub fn part_b(readings: Vec<&str>) -> (u32, u32, u32) {
-
     let bits = readings[0].len();
-    let max = (lines.len() + 1) / 2;
 
-    let bits = lines[0].len();
+    let oxygen_rating = find_rating(&readings, bits, true);
+    let co2_rating = find_rating(&readings, bits, false);
 
-    // To make sure we only perform operations on the bits we want.
-    let bitmask = (1 << bits) - 1;
+    let oxygen = u32::from_str_radix(oxygen_rating, 2).unwrap();
+    let co2 = u32::from_str_radix(co2_rating, 2).unwrap();
 
-    // Bit shift gamma as required
-    let mut gamma = 0;
-
-    let oxygen_rating = (0..bits)
-        .scan(readings.clone(), |oxygen, i| {
-            let max = (oxygen.len() as f32 / 2.0).ceil() as usize;
-
-            let mut sig = b'0';
-            let count = oxygen.iter()
-                .filter(|o| (**o).as_bytes()[i] == b'1')
-                .count();
-            if count >= max {
-                sig = b'1';
-            }
-
-            oxygen.drain_filter(|o| (*o).as_bytes()[i] != sig);
-            oxygen.first().copied()
-        })
-        .last()
-        .unwrap();
-
-    let co2_rating = (0..bits)
-        .scan(readings, |co2, i| {
-            let max = (co2.len() as f32 / 2.0).ceil() as usize;
-
-            let mut sig = b'1';
-            let count = co2.iter()
-                .filter(|c| (**c).as_bytes()[i] == b'1')
-                .count();
-            if count >= max {
-                sig = b'0';
-            }
-
-            co2.drain_filter(|c| (*c).as_bytes()[i] != sig);
-            co2.first().copied()
-        })
-        .last()
-        .unwrap();
-
-    let oxygen = usize::from_str_radix(oxygen_rating, 2).unwrap();
-    let co2 = usize::from_str_radix(co2_rating, 2).unwrap();
-
-    (oxygen as u32, co2 as u32, (oxygen * co2) as u32)
+    (oxygen, co2, oxygen * co2)
 }
 
 #[cfg(test)]
@@ -109,7 +91,7 @@ mod tests {
 
     use super::*;
 
-    const INPUT: &'static str = "
+    const INPUT: &str = "
 00100
 11110
 10110

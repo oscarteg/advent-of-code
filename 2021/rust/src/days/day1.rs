@@ -1,11 +1,5 @@
-use anyhow::Result;
-
-pub fn descending_window(data: Vec<u64>) -> Result<usize> {
-    data.windows().fil
-}
-
-pub fn sonar_sweep(data: Vec<u64>) -> Result<usize> {
-    data.windows(2).filter(|x| x[0] < x[1]).count() as u64
+pub fn sonar_sweep(data: Vec<u64>) -> usize {
+    data.windows(2).filter(|x| x[0] < x[1]).count()
 }
 
 pub fn sonar_sweep_window(data: Vec<u64>) -> u64 {
@@ -17,7 +11,7 @@ mod tests {
     use super::*;
     use crate::utils::{clean_input, read_file};
 
-    const INPUT: &'static str = "
+    const INPUT: &str = "
 199
 200
 208

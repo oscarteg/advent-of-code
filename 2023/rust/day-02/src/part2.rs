@@ -21,8 +21,6 @@ impl FromStr for Color {
                 std::io::ErrorKind::InvalidInput,
                 format!("Failed to parse '{}' as a color", s),
             ))),
-
-
         }
     }
 }

@@ -1,11 +1,9 @@
-
 mod days;
 
 fn main() {
     println!("Hello, world!");
 }
 
-#[cfg(test)]
 pub mod utils {
     use anyhow::Result;
     use std::fmt::Debug;

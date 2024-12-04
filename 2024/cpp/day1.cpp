@@ -14,7 +14,7 @@ std::pair<std::vector<int>, std::vector<int>> parse_input() {
   // While next line
   while (std::getline(std::cin, line)) {
     if (line.empty()) {
-      continue;
+      break;
     }
 
     std::istringstream iss(line);
@@ -29,14 +29,6 @@ std::pair<std::vector<int>, std::vector<int>> parse_input() {
 }
 
 int main(int argc, char *argv[]) {
-  //
-  //   std::istringstream input(R"(3   4
-  // 4   3
-  // 2   5
-  // 1   3
-  // 3   9
-  // 3   3)");
-
   auto [left, right] = parse_input();
 
   std::sort(left.begin(), left.end());

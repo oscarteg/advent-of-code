@@ -1,19 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
   "packages": [
-    "zig@latest",
-    "go@latest",
     "rustup@latest",
-    "libiconv@latest"
+    "libiconv@latest",
+    "zig@latest",
+    "go@1.23.4"
   ],
   "shell": {
     "init_hook": [
-      "echo 'Welcome to devbox!' > /dev/null"
+      "set -l projectDir (pwd)",
+      "set -l rustupHomeDir \"$projectDir\"/.rustup",
+      "mkdir -p $rustupHomeDir",
+      "set -gx RUSTUP_HOME $rustupHomeDir",
+      "set -gx LIBRARY_PATH $LIBRARY_PATH:\"$projectDir/nix/profile/default/lib\"",
+      "rustup default stable"
     ],
     "scripts": {
-      "test": [
-        "echo \"Error: no test specified\" && exit 1"
-      ]
+      "test": "cargo test -- --show-output",
+      "start": "cargo run",
+      "build-docs": "cargo doc"
     }
   }
 }

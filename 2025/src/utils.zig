@@ -25,14 +25,8 @@ pub const LineIterator = struct {
             end += 1;
         }
 
-        // Trim \r if present (Windows line endings)
-        var line_end = end;
-        if (line_end > start and self.buffer[line_end - 1] == '\r') {
-            line_end -= 1;
-        }
-
         self.index = if (end < self.buffer.len) end + 1 else end;
-        return self.buffer[start..line_end];
+        return self.buffer[start..end];
     }
 };
 

@@ -30,11 +30,9 @@ const Rotation = struct {
         };
     }
 
-    /// Apply rotation and count zero crossings - divmod gives us both!
     fn applyAndCountCrossings(self: Rotation, start: i32) struct { position: i32, crossings: u32 } {
         return switch (self.direction) {
             .right => {
-                // divmod gives us both: .div = crossings, .rem = final position
                 const result = utils.divmod(start + self.distance, 100);
                 return .{
                     .position = result.rem,
@@ -42,13 +40,13 @@ const Rotation = struct {
                 };
             },
             .left => {
-                // Use divmod for final position
-                // Count crossings
                 const result = utils.divmod(start - self.distance, 100);
-                const crossings: u32 = if (self.distance <= start)
+                const crossings: u32 = if (start == 0)
+                    @intCast(utils.divmod(self.distance, 100).div)
+                else if (self.distance < start)
                     0
                 else blk: {
-                    const cross_result = utils.divmod(self.distance - start - 1, 100);
+                    const cross_result = utils.divmod(self.distance - start, 100);
                     break :blk @intCast(1 + cross_result.div);
                 };
                 return .{

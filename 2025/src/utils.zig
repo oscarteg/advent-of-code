@@ -1,8 +1,11 @@
 const std = @import("std");
 
-/// Reads all input from stdin into a buffer
-pub fn readStdin(allocator: std.mem.Allocator) ![]const u8 {
-    const input = try std.fs.File.stdin().readToEndAlloc(allocator, 10 * 1024 * 1024); // 10MB max
+/// Reads all of stdin and trims surrounding whitespace.
+/// Pass an arena allocator: the trimmed slice may not start at the allocation.
+pub fn readStdin(io: std.Io, allocator: std.mem.Allocator) ![]const u8 {
+    var buffer: [4096]u8 = undefined;
+    var reader = std.Io.File.stdin().reader(io, &buffer);
+    const input = try reader.interface.allocRemaining(allocator, .unlimited);
     return std.mem.trim(u8, input, &std.ascii.whitespace);
 }
 

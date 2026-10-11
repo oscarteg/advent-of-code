@@ -1,34 +1,46 @@
 const std = @import("std");
 
-pub fn build(b: *std.build.Builder) void {
-    // Standard target options allows the person running `zig build` to choose
-    // what target to build for. Here we do not override the defaults, which
-    // means any target is allowed, and the default is native. Other options
-    // for restricting supported target set are available.
+const days = [_][]const u8{
+    "day_1",  "day_2",  "day_3",  "day_4",  "day_5",
+    "day_6",  "day_7",  "day_8",  "day_9",  "day_10",
+    "day_11", "day_12", "day_13", "day_14", "day_15",
+    "day_16", "day_17", "day_18", "day_19", "day_20",
+    "day_21", "day_22", "day_23", "day_24", "day_25",
+};
+
+pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
 
-    // Standard release options allow the person running `zig build` to select
-    // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall.
-    const mode = b.standardReleaseOptions();
+    const test_step = b.step("test", "Run unit tests for every day");
 
-    const exe = b.addExecutable("zig", "src/main.zig");
-    exe.setTarget(target);
-    exe.setBuildMode(mode);
-    exe.install();
+    for (days) |day| {
+        const root_source_file = b.path(b.fmt("src/{s}.zig", .{day}));
 
-    const run_cmd = exe.run();
-    run_cmd.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
+        const exe = b.addExecutable(.{
+            .name = day,
+            .root_module = b.createModule(.{
+                .root_source_file = root_source_file,
+                .target = target,
+                .optimize = optimize,
+            }),
+        });
+        b.installArtifact(exe);
+
+        const run_cmd = b.addRunArtifact(exe);
+        run_cmd.step.dependOn(b.getInstallStep());
+        if (b.args) |args| run_cmd.addArgs(args);
+        const run_step = b.step(b.fmt("run-{s}", .{day}), b.fmt("Run {s}", .{day}));
+        run_step.dependOn(&run_cmd.step);
+
+        const exe_tests = b.addTest(.{
+            .root_module = b.createModule(.{
+                .root_source_file = root_source_file,
+                .target = target,
+                .optimize = optimize,
+            }),
+        });
+        const run_tests = b.addRunArtifact(exe_tests);
+        test_step.dependOn(&run_tests.step);
     }
-
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
-
-    const exe_tests = b.addTest("src/main.zig");
-    exe_tests.setTarget(target);
-    exe_tests.setBuildMode(mode);
-
-    const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&exe_tests.step);
 }

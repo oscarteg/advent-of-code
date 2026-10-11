@@ -1,80 +1,74 @@
 const std = @import("std");
-const testing = @import("std").testing;
+const testing = std.testing;
 
-/// Reads an entire file into memory, caller owns the returned slice.
-pub fn read_file(allocator: std.mem.Allocator, file_path: []const u8) ![]u8 {
-    var path_buffer: [std.fs.MAX_PATH_BYTES]u8 = undefined;
-    const path = try std.fs.realpath(file_path, &path_buffer);
-
-    const file = try std.fs.openFileAbsolute(path, .{});
-    defer file.close();
-
-    var buf = try file.readToEndAlloc(
-        allocator,
-        (try file.stat()).size,
-    );
-
-    return allocator.resize(buf, buf.len - 1).?;
-}
-
-pub const Result = union(enum) {
-    int: i64,
-    string: []const u8,
-
-    pub fn cmp(self: Result, result: Result) bool {
-        switch (self) {
-            .int => |i| return i == result.int,
-            .string => |s| return std.mem.eql(u8, s, result.string),
-        }
-    }
-
-    pub fn deinit(self: Result, allocator: std.mem.Allocator) void {
-        switch (self) {
-            .string => |s| return allocator.free(s),
-            else => {},
-        }
-    }
+const Answers = struct {
+    part1: u32,
+    part2: u32,
 };
 
-pub fn puzzle_1(input: []const u8) !Result {
-    var iter = std.mem.split(u8, input, "\n");
-    var count: i32 = 0;
-    var max: i32 = 0;
+fn elfTotals(allocator: std.mem.Allocator, input: []const u8) ![]u32 {
+    var totals: std.ArrayList(u32) = .empty;
+    errdefer totals.deinit(allocator);
 
-    while (iter.next()) |line| {
-        if (line.len == 0) {
-            if (count > max) max = count;
-            count = 0;
-            continue;
+    const trimmed = std.mem.trim(u8, input, "\n");
+    if (trimmed.len == 0) return error.EmptyInput;
+
+    var elves = std.mem.splitSequence(u8, trimmed, "\n\n");
+    while (elves.next()) |elf| {
+        var total: u32 = 0;
+        var foods = std.mem.tokenizeScalar(u8, elf, '\n');
+        while (foods.next()) |food| {
+            total += try std.fmt.parseInt(u32, std.mem.trim(u8, food, " \t\r"), 10);
         }
-        const number = try std.fmt.parseInt(i32, line, 0);
-        count += number;
+        try totals.append(allocator, total);
     }
 
-    return .{ .int = max };
+    if (totals.items.len == 0) return error.EmptyInput;
+    return totals.toOwnedSlice(allocator);
 }
 
-test "part_1_test" {
-    var input =
-        \\1000
-        \\2000
-        \\3000
-        \\
-        \\4000
-        \\
-        \\5000
-        \\6000
-        \\
-        \\7000
-        \\8000
-        \\9000
-        \\
-        \\10000
-    ;
-    defer std.testing.allocator.free(input);
+pub fn solve(allocator: std.mem.Allocator, input: []const u8) !Answers {
+    const totals = try elfTotals(allocator, input);
+    defer allocator.free(totals);
 
-    const result = try puzzle_1(input);
-    defer result.deinit(std.testing.allocator);
+    std.mem.sort(u32, totals, {}, std.sort.desc(u32));
 
-    try testing.expectEqual(result, .{ .int = 24000 });
+    var part2: u32 = 0;
+    for (totals[0..@min(3, totals.len)]) |total| part2 += total;
+
+    return .{ .part1 = totals[0], .part2 = part2 };
+}
+
+pub fn main(init: std.process.Init) !void {
+    const arena = init.arena.allocator();
+    var stdin_buffer: [4096]u8 = undefined;
+    var stdin_reader = std.Io.File.stdin().reader(init.io, &stdin_buffer);
+    const input = try stdin_reader.interface.allocRemaining(arena, .unlimited);
+    const answers = try solve(arena, input);
+    var stdout_buffer: [256]u8 = undefined;
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
+    const stdout = &stdout_writer.interface;
+    try stdout.print("Part 1: {d}\nPart 2: {d}\n", .{ answers.part1, answers.part2 });
+    try stdout.flush();
+}
+
+test "official example" {
+    const input = @embedFile("examples/day_1.txt");
+    const answers = try solve(testing.allocator, input);
+    try testing.expectEqual(@as(u32, 24000), answers.part1);
+    try testing.expectEqual(@as(u32, 45000), answers.part2);
+}
+
+test "single elf" {
+    const answers = try solve(testing.allocator, "100\n200");
+    try testing.expectEqual(@as(u32, 300), answers.part1);
+    try testing.expectEqual(@as(u32, 300), answers.part2);
+}
+
+test "malformed calorie value returns error" {
+    try testing.expectError(error.InvalidCharacter, solve(testing.allocator, "1000\nnot-a-number\n\n2000"));
+}
+
+test "empty input returns error" {
+    try testing.expectError(error.EmptyInput, solve(testing.allocator, ""));
 }

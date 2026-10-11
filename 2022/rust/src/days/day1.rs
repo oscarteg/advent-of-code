@@ -1,73 +1,73 @@
-pub fn part_one(input: &str) -> Option<i32> {
-    let elfs = input.split("\n\n");
+use anyhow::{Context, Result};
 
-    let mut max_calories = Some(0);
-    for elf in elfs {
-        let calories = elf
-            .split('\n')
-            .map(|food| food.parse::<i32>().unwrap_or(0))
-            .reduce(|a, b| a + b);
-        if calories.is_some() && calories > max_calories {
-            max_calories = calories;
-        }
-    }
-    max_calories
+struct ElfCalories(u32);
+
+fn parse(input: &str) -> Result<Vec<ElfCalories>> {
+    let input = input.trim();
+    anyhow::ensure!(!input.is_empty(), "input is empty");
+
+    input
+        .split("\n\n")
+        .map(|elf| {
+            elf.lines()
+                .map(|line| {
+                    line.trim()
+                        .parse::<u32>()
+                        .with_context(|| format!("invalid calorie value: {line:?}"))
+                })
+                .try_fold(0u32, |total, calories| calories.map(|value| total + value))
+                .map(ElfCalories)
+        })
+        .collect()
 }
 
-pub fn part_two(input: &str) -> Option<i32> {
-    let elfs = input.split("\n\n");
+pub fn solve(input: &str) -> Result<(u32, u32)> {
+    let elves = parse(input)?;
+    anyhow::ensure!(!elves.is_empty(), "input has no elves");
 
-    let mut calories_arr: Vec<i32> = vec![];
-    for elf in elfs {
-        let calories = elf
-            .split('\n')
-            .map(|food| food.parse::<i32>().unwrap_or(0))
-            .reduce(|a, b| a + b);
-        if calories.is_some() {
-            calories_arr.push(calories.unwrap_or(0))
-        }
-    }
-    calories_arr.sort_by(|a, b| b.cmp(a));
-    let result: i32 = calories_arr[0..3].iter().sum();
-    Some(result)
+    let mut totals: Vec<u32> = elves.into_iter().map(|elf| elf.0).collect();
+    totals.sort_unstable_by(|a, b| b.cmp(a));
+
+    let part1 = totals[0];
+    let part2 = totals.iter().take(3).sum();
+    Ok((part1, part2))
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{utils::read_file, days::day1::{part_one, part_two}};
+    use super::solve;
 
-    const INPUT: &str = "1000
-2000
-3000
-
-4000
-
-5000
-6000
-
-7000
-8000
-9000
-
-10000";
+    const EXAMPLE: &str = include_str!("../../input/day1-example.txt");
 
     #[test]
-    pub fn test_part_1() {
-        // Example
-        assert_eq!(part_one(INPUT), Some(24000));
-
-        // Input
-        let file: String = read_file("input/day1.txt");
-        assert_eq!(part_one(file.as_str()), Some(70764));
+    fn test_part_1_and_2_example() {
+        let (part1, part2) = solve(EXAMPLE).unwrap();
+        assert_eq!(part1, 24000);
+        assert_eq!(part2, 45000);
     }
 
     #[test]
-    fn test_part_2() {
-        // Example
-        assert_eq!(part_two(INPUT), Some(45000));
+    fn test_part_1_and_2_real_input() {
+        let file = std::fs::read_to_string("input/day1.txt").unwrap();
+        let (part1, part2) = solve(&file).unwrap();
+        assert_eq!(part1, 70764);
+        assert_eq!(part2, 203905);
+    }
 
-        // Input
-        let file: String = read_file("input/day1.txt");
-        assert_eq!(part_two(file.as_str()), Some(203905));
+    #[test]
+    fn test_single_elf() {
+        let (part1, part2) = solve("100\n200").unwrap();
+        assert_eq!(part1, 300);
+        assert_eq!(part2, 300);
+    }
+
+    #[test]
+    fn test_malformed_input_is_err() {
+        assert!(solve("1000\nnot-a-number\n\n2000").is_err());
+    }
+
+    #[test]
+    fn test_empty_input_is_err() {
+        assert!(solve("").is_err());
     }
 }

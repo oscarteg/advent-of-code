@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Run one Advent of Code day: ./run <year> <day> <language> < input.txt
+# Also works interactively: ./run 2025 day12 zig   (paste the input, end with Ctrl-D)
+set -euo pipefail
+
+if [ $# -ne 3 ]; then
+  echo "usage: ./run <year> <day> <rust|go|zig|cpp> < input.txt" >&2
+  exit 2
+fi
+
+year=$1
+day=${2#day}
+lang=$3
+case "$day" in
+  *[!0-9]* | '')
+    echo "day must be a number, got '$2'" >&2
+    exit 2
+    ;;
+esac
+day=$((10#$day))            # unpadded, e.g. 7
+pad=$(printf '%02d' "$day") # zero-padded, e.g. 07
+
+cd "$(dirname "$0")"
+if [ -t 0 ]; then
+  echo "paste the puzzle input, then press Ctrl-D:" >&2
+fi
+
+case "$year/$lang" in
+  2020/rust | 2021/rust | 2022/rust) cd "$year/rust" && exec cargo run -q --bin "day$day" ;;
+  2023/rust) cd 2023/rust && exec cargo run -q --bin "day$pad" ;;
+  2020/go) cd 2020/go && exec go run . "$day" ;;
+  2021/go | 2022/go | 2023/go | 2024/go | 2025/go) cd "$year/go" && exec go run "./day$pad" ;;
+  2022/zig) cd 2022/zig && exec zig run "src/day_$day.zig" ;;
+  2024/zig) cd 2024/zig && exec zig run "day$day.zig" ;;
+  2025/zig) cd 2025 && exec zig run "src/day$day.zig" ;;
+  2024/cpp) cd 2024/cpp && exec make -s run "day=day$day" ;;
+  *)
+    echo "no $lang solutions for $year" >&2
+    exit 2
+    ;;
+esac

@@ -1,150 +1,131 @@
-use std::ops::RangeInclusive;
-
+use anyhow::{bail, Context, Result};
 use lazy_static::lazy_static;
 use regex::Regex;
 
-// Day 2 - Password Philosophy
-//
-// Updated multiple times to get faster speeds.
-// Fastest, also a very clean solution, seems to be using a RegEx
-
 lazy_static! {
-    /// Input is in the form "1-3 a: abcdef"
-    static ref RE: Regex = Regex::new(r"(\d+)-(\d+) (\w): (\w*)").unwrap();
+    // Matches lines like "1-3 a: abcde" into (low, high, letter, password).
+    static ref RE: Regex = Regex::new(r"^(\d+)-(\d+) (\w): (\w+)$").unwrap();
 }
 
-/// Official Toboggan Corporate Policy
-pub struct OTCP {
+struct Policy {
+    low: usize,
+    high: usize,
+    letter: char,
     password: String,
-    policy: char,
-    bounds: RangeInclusive<usize>,
 }
 
-impl std::str::FromStr for OTCP {
-    type Err = ();
+impl Policy {
+    fn parse(line: &str) -> Result<Self> {
+        let captures = RE
+            .captures(line)
+            .with_context(|| format!("line does not match policy format: {line:?}"))?;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        parse(s).ok_or_else(|| unreachable!("Unable to parse"))
+        Ok(Policy {
+            low: captures[1].parse().context("low bound is not a number")?,
+            high: captures[2].parse().context("high bound is not a number")?,
+            letter: captures[3]
+                .chars()
+                .next()
+                .context("policy letter is missing")?,
+            password: captures[4].to_string(),
+        })
+    }
+
+    fn is_valid_by_count(&self) -> bool {
+        let occurrences = self.password.chars().filter(|&c| c == self.letter).count();
+        (self.low..=self.high).contains(&occurrences)
+    }
+
+    // Exactly one of the two 1-indexed positions must hold the letter.
+    fn is_valid_by_position(&self) -> Result<bool> {
+        let at = |pos: usize| -> Result<char> {
+            self.password.chars().nth(pos - 1).with_context(|| {
+                format!(
+                    "password {:?} has no character at position {pos}",
+                    self.password
+                )
+            })
+        };
+
+        Ok((at(self.low)? == self.letter) ^ (at(self.high)? == self.letter))
     }
 }
 
-fn parse(line: &str) -> Option<OTCP> {
-    let results = RE.captures(line)?;
-    let lower_bound = results.get(1)?.as_str().parse().ok()?;
-    let upper_bound = results.get(2)?.as_str().parse().ok()?;
-
-    Some(OTCP {
-        password: results.get(4)?.as_str().to_string(),
-        bounds: (lower_bound..=upper_bound),
-        policy: results.get(3)?.as_str().chars().next()?,
-    })
+fn parse_policies(input: &str) -> Result<Vec<Policy>> {
+    input
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .map(Policy::parse)
+        .collect()
 }
 
-/* Part One
- *
- * Your flight departs in a few days from the coastal airport;
- * the easiest way down to the coast from here is via toboggan.
- *
- * The shopkeeper at the North Pole Toboggan Rental Shop is having a bad day.
- * "Something's wrong with our computers; we can't log in!" You ask if you can take a look.
- *
- * Their password database seems to be a little corrupted:
- * some of the passwords wouldn't have been allowed by the
- * Official Toboggan Corporate Policy that was in effect when they were chosen.
- *
- * To try to debug the problem, they have created a list (your puzzle input)
- * of passwords (according to the corrupted database)
- * and the corporate policy when that password was set.
- *
- * For example, suppose you have the following list:
- *
- * 1-3 a: abcde
- * 1-3 b: cdefg
- * 2-9 c: ccccccccc
- *
- * Each line gives the password policy and then the password.
- * The password policy indicates the lowest and highest number of times
- * a given letter must appear for the password to be valid.
- * For example, 1-3 a means that the password must contain a at least 1 time and at most 3 times.
- *
- * In the above example, 2 passwords are valid. The middle password, cdefg, is not;
- * it contains no instances of b, but needs at least 1. The first and third passwords are valid:
- * they contain one a or nine c, both within the limits of their respective policies.
- *
- * How many passwords are valid according to their policies?
-*/
-pub fn solve_part_01(input: &[OTCP]) -> usize {
-    input
-        .iter()
-        .filter(|otcp| {
-            otcp.bounds
-                .contains(&otcp.password.chars().filter(|c| c == &otcp.policy).count())
-        })
-        .count()
+fn solve_part_01(policies: &[Policy]) -> usize {
+    policies.iter().filter(|p| p.is_valid_by_count()).count()
 }
 
-/* Part Two
- *
- * While it appears you validated the passwords correctly,
- * they don't seem to be what the Official Toboggan Corporate Authentication System is expecting.
- *
- * The shopkeeper suddenly realizes that he just accidentally explained the password
- * policy rules from his old job at the sled rental place down the street!
- * The Official Toboggan Corporate Policy actually works a little differently.
- *
- * Each policy actually describes two positions in the password, where 1 means the first character,
- * 2 means the second character, and so on. (Be careful; Toboggan Corporate Policies have no concept of "index zero"!)
- * Exactly one of these positions must contain the given letter.
- * Other occurrences of the letter are irrelevant for the purposes of policy enforcement.
- *
- * Given the same example list from above:
- *
- * 1-3 a: abcde is valid: position 1 contains a and position 3 does not.
- * 1-3 b: cdefg is invalid: neither position 1 nor position 3 contains b.
- * 2-9 c: ccccccccc is invalid: both position 2 and position 9 contain c.
- *
- * How many passwords are valid according to the new interpretation of the policies?
-*/
-pub fn solve_part_02(input: &[OTCP]) -> usize {
-    input
-        .iter()
-        .filter(|otcp| {
-            let (lower, upper) = otcp.bounds.clone().into_inner();
-            let lower_value = otcp.password.chars().nth(lower - 1).unwrap();
-            let upper_value = otcp.password.chars().nth(upper - 1).unwrap();
+fn solve_part_02(policies: &[Policy]) -> Result<usize> {
+    let mut valid = 0;
+    for policy in policies {
+        if policy.is_valid_by_position()? {
+            valid += 1;
+        }
+    }
+    Ok(valid)
+}
 
-            (lower_value == otcp.policy) ^ (upper_value == otcp.policy)
-        })
-        .count()
+pub fn solve(input: &str) -> Result<(usize, usize)> {
+    if input.trim().is_empty() {
+        bail!("input is empty");
+    }
+
+    let policies = parse_policies(input)?;
+    let part1 = solve_part_01(&policies);
+    let part2 = solve_part_02(&policies)?;
+
+    Ok((part1, part2))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::input_vec;
 
-    /// Test example data on part 1
+    const EXAMPLE: &str = include_str!("../../input/2020/day2-example.txt");
+
     #[test]
-    fn sample_01() {
-        let data = "
-1-3 a: abcde
-1-3 b: cdefg
-2-9 c: ccccccccc
-";
-
-        assert_eq!(solve_part_01(&input_vec(data)), 2)
+    fn sample_part_01() {
+        let (part1, _) = solve(EXAMPLE).unwrap();
+        assert_eq!(part1, 2);
     }
 
-    /// Test example data on part 2
     #[test]
-    fn sample_02() {
-        let data = "
-1-3 a: abcde
-1-3 b: cdefg
-2-9 c: ccccccccc
-";
+    fn sample_part_02() {
+        let (_, part2) = solve(EXAMPLE).unwrap();
+        assert_eq!(part2, 1);
+    }
 
-        assert_eq!(solve_part_02(&input_vec(data)), 1)
+    #[test]
+    fn position_rule_rejects_both_positions_matching() {
+        let policies = parse_policies("2-9 c: ccccccccc").unwrap();
+        assert!(!policies[0].is_valid_by_position().unwrap());
+    }
+
+    #[test]
+    fn malformed_line_is_an_error() {
+        assert!(Policy::parse("not a policy line").is_err());
+        assert!(solve("not a policy line").is_err());
+    }
+
+    #[test]
+    fn empty_input_is_an_error() {
+        assert!(solve("").is_err());
+    }
+
+    #[test]
+    fn real_input_answers() {
+        let input = std::fs::read_to_string("input/2020/day2.txt").unwrap();
+        let (part1, part2) = solve(&input).unwrap();
+        assert_eq!(part1, 515);
+        assert_eq!(part2, 711);
     }
 }
-

@@ -1,0 +1,4 @@
+# Real puzzle inputs stay local: Advent of Code asks not to publish them.
+input/
+# Local scratch copies.
+zig/scratch/

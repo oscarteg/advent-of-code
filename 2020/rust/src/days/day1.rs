@@ -1,107 +1,110 @@
 use std::collections::HashSet;
 
-// Day 1: Report Repair
-// A version of "Two Sum Problem"
-// https://leetcode.com/problems/two-sum/solution/
-//
-// I did the naive solutions first which are O(n^2) and O(n^3).
-// It was fast enough to get a quick answer. I then refactored
-// using a HashSet which gets it down to O(n) and O(n^2) and it
-// could be seen in the performance testing.
+/// Day 1: Report Repair
+/// Find two or three entries that sum to 2020 and multiply them.
+pub fn solve(input: &str) -> anyhow::Result<(u32, u32)> {
+    let mut entries = HashSet::new();
 
-/* Part One
- *
- * Before you leave, the Elves in accounting just need you to fix your
- * expense report (your puzzle input); apparently, something isn't quite adding up.
- *
- * Specifically, they need you to find the two entries that sum to
- * `2020` and then multiply those two numbers together.
- *
- * For example, suppose your expense report contained the following:
- *
- * 1721
- * 979
- * 366
- * 299
- * 675
- * 1456
- *
- * In this list, the two entries that sum to 2020 are 1721 and 299.
- * Multiplying them together produces 1721 * 299 = 514579, so the correct answer is 514579.
- *
- * Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
-*/
-pub fn solve_part_01(input: &HashSet<u32>) -> u32 {
-    for x in input {
-        let y = 2020 - x;
-        if input.contains(&y) {
-            return x * y;
+    for line in input.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
         }
+        let num: u32 = line
+            .parse()
+            .map_err(|_| anyhow::anyhow!("Invalid number: {}", line))?;
+        entries.insert(num);
     }
 
-    0
+    anyhow::ensure!(!entries.is_empty(), "No entries found");
+
+    let part1 = solve_part1(&entries)?;
+    let part2 = solve_part2(&entries)?;
+
+    Ok((part1, part2))
 }
 
-/* Part Two
- *
- * The Elves in accounting are thankful for your help; one of them even offers you
- * a starfish coin they had left over from a past vacation. They offer you a second
- * one if you can find three numbers in your expense report that meet the same criteria.
- *
- * Using the above example again, the three entries that sum to 2020 are 979, 366, and 675.
- * Multiplying them together produces the answer, 241861950.
- *
- * In your expense report, what is the product of the three entries that sum to 2020?
-*/
-pub fn solve_part_02(input: &HashSet<u32>) -> u32 {
-    for x in input {
-        for y in input {
-            if x + y > 2020 {
+fn solve_part1(entries: &HashSet<u32>) -> anyhow::Result<u32> {
+    for &x in entries {
+        let y = 2020u32.saturating_sub(x);
+        if y > 0 && entries.contains(&y) && x != y {
+            return Ok(x * y);
+        }
+    }
+    anyhow::bail!("No solution found for part 1")
+}
+
+fn solve_part2(entries: &HashSet<u32>) -> anyhow::Result<u32> {
+    let entries_vec: Vec<u32> = entries.iter().copied().collect();
+
+    for (i, &x) in entries_vec.iter().enumerate() {
+        for &y in &entries_vec[i..] {
+            if x + y >= 2020 {
                 continue;
             }
-
             let z = 2020 - x - y;
-
-            if input.contains(&z) {
-                return x * y * z;
+            if entries.contains(&z) && z != x && z != y {
+                return Ok(x * y * z);
             }
         }
     }
-
-    0
+    anyhow::bail!("No solution found for part 2")
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::input_hashset;
-
     use super::*;
 
-    #[test]
-    fn sample_01() {
-        let data = "
-1721
+    const EXAMPLE: &str = "1721
 979
 366
 299
 675
-1456
-";
+1456";
 
-        assert_eq!(solve_part_01(&input_hashset(data)), 514579)
+    #[test]
+    fn test_example() {
+        let (part1, part2) = solve(EXAMPLE).unwrap();
+        assert_eq!(part1, 514579);
+        assert_eq!(part2, 241861950);
     }
 
     #[test]
-    fn sample_02() {
-        let data = "
-1721
-979
-366
-299
-675
-1456
-";
+    fn test_small_example_part1() {
+        let input = "1010\n1010";
+        let result = solve(input);
+        assert!(result.is_err());
+    }
 
-        assert_eq!(solve_part_02(&input_hashset(data)), 241861950)
+    #[test]
+    fn test_empty_input() {
+        let result = solve("");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_invalid_number() {
+        let result = solve("123\nabc\n456");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_insufficient_entries() {
+        let result = solve("1000");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_no_solution() {
+        let result = solve("1\n2\n3\n4\n5");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_whitespace_handling() {
+        let input = "  1721  \n  979  \n  366  \n  299  \n  675  \n  1456  ";
+        let (part1, part2) = solve(input).unwrap();
+        assert_eq!(part1, 514579);
+        assert_eq!(part2, 241861950);
     }
 }

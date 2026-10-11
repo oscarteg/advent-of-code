@@ -1,27 +1,43 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
+use anyhow::ensure;
 
-pub fn part_a(lines: Vec<&str>) -> (u32, u32, u32) {
-    let max = (lines.len() + 1) / 2;
+pub fn solve(input: &str) -> anyhow::Result<(u32, u32)> {
+    let lines: Vec<&str> = input.lines().filter(|l| !l.trim().is_empty()).collect();
+    ensure!(!lines.is_empty(), "input must not be empty");
 
     let bits = lines[0].len();
+    ensure!(bits > 0, "each line must have at least one bit");
+    for (i, line) in lines.iter().enumerate() {
+        ensure!(
+            line.len() == bits,
+            "line {}: all lines must have the same length",
+            i
+        );
+        ensure!(
+            line.chars().all(|c| c == '0' || c == '1'),
+            "line {}: contains non-binary characters",
+            i
+        );
+    }
 
-    // To make sure we only perform operations on the bits we want.
-    let bitmask = (1 << bits) - 1;
+    let part1 = power_consumption(&lines, bits)?;
+    let part2 = life_support_rating(&lines, bits)?;
 
-    // Bit shift gamma as required
-    let mut gamma = 0;
+    Ok((part1, part2))
+}
+
+fn power_consumption(lines: &[&str], bits: usize) -> anyhow::Result<u32> {
+    let max = lines.len().div_ceil(2);
+    let bitmask = (1u32 << bits) - 1;
+
+    let mut gamma = 0u32;
 
     lines
-        .into_iter()
-        .fold(vec![0; bits], |count, reading| {
-            // Count all occurrences of 1 at each bit position within a reading
-            // It returns 1 array with an incremented value when 1 the bit position has value 1
+        .iter()
+        .fold(vec![0usize; bits], |count, reading| {
             count
                 .into_iter()
                 .enumerate()
                 .map(|(index, number)| {
-                    // Compare
                     if reading.as_bytes()[index] == b'1' {
                         number + 1
                     } else {
@@ -32,20 +48,31 @@ pub fn part_a(lines: Vec<&str>) -> (u32, u32, u32) {
         })
         .into_iter()
         .enumerate()
-        .for_each(|(i, bit)| {
-            // If the number of bits is more than half of all lines than 1 occures more than 0
-            if bit >= max {
-                gamma += 1 << (bits - (i + 1))
+        .for_each(|(i, bit_count)| {
+            if bit_count >= max {
+                gamma += 1u32 << (bits - (i + 1));
             }
         });
 
-    // let epsilon = !gamma & bitmask;
     let epsilon = !gamma & bitmask;
-
-    (gamma, epsilon, gamma * epsilon)
+    Ok(gamma * epsilon)
 }
 
-fn find_rating<'a>(readings: &'a [&'a str], bits: usize, keep_most_common: bool) -> &'a str {
+fn life_support_rating(readings: &[&str], bits: usize) -> anyhow::Result<u32> {
+    let oxygen_rating = find_rating(readings, bits, true)?;
+    let co2_rating = find_rating(readings, bits, false)?;
+
+    let oxygen = u32::from_str_radix(oxygen_rating, 2)?;
+    let co2 = u32::from_str_radix(co2_rating, 2)?;
+
+    Ok(oxygen * co2)
+}
+
+fn find_rating<'a>(
+    readings: &[&'a str],
+    bits: usize,
+    keep_most_common: bool,
+) -> anyhow::Result<&'a str> {
     let mut candidates = readings.to_vec();
 
     for i in 0..bits {
@@ -67,32 +94,15 @@ fn find_rating<'a>(readings: &'a [&'a str], bits: usize, keep_most_common: bool)
         candidates.retain(|&s| s.as_bytes()[i] == desired_bit);
     }
 
-    candidates[0]
-}
-
-pub fn part_b(readings: Vec<&str>) -> (u32, u32, u32) {
-    let bits = readings[0].len();
-
-    let oxygen_rating = find_rating(&readings, bits, true);
-    let co2_rating = find_rating(&readings, bits, false);
-
-    let oxygen = u32::from_str_radix(oxygen_rating, 2).unwrap();
-    let co2 = u32::from_str_radix(co2_rating, 2).unwrap();
-
-    (oxygen, co2, oxygen * co2)
+    ensure!(!candidates.is_empty(), "no candidates found");
+    Ok(candidates[0])
 }
 
 #[cfg(test)]
 mod tests {
-    #![allow(dead_code)]
-    #![allow(unused_variables)]
-
-    use crate::utils::{clean_input, read_file};
-
     use super::*;
 
-    const INPUT: &str = "
-00100
+    const EXAMPLE: &str = "00100
 11110
 10110
 10111
@@ -106,48 +116,47 @@ mod tests {
 01010";
 
     #[test]
-    pub fn test_part_a_example() {
-        let input = clean_input(INPUT).collect();
-
-        let (gamma, epsilon, gamma_epsilon) = part_a(input);
-
-        assert_eq!(gamma, 22);
-        assert_eq!(epsilon, 9);
-        assert_eq!(gamma_epsilon, 198);
+    fn test_example() {
+        let (part1, part2) = solve(EXAMPLE).expect("valid input");
+        assert_eq!(part1, 198, "example part 1");
+        assert_eq!(part2, 230, "example part 2");
     }
 
     #[test]
-    fn test_part_a() {
-        let file = read_file("input/day3.txt");
-        let input = clean_input(file.as_str()).collect();
-
-        let (gamma, epsilon, gamma_epsilon) = part_a(input);
-
-        assert_eq!(gamma, 3069);
-        assert_eq!(epsilon, 1026);
-        assert_eq!(gamma_epsilon, 3148794);
+    fn test_real_input() {
+        let input = std::fs::read_to_string("input/day3.txt").expect("failed to read real input");
+        let (part1, part2) = solve(&input).expect("valid input");
+        assert_eq!(part1, 3148794, "real input part 1");
+        assert_eq!(part2, 2795310, "real input part 2");
     }
 
     #[test]
-    fn test_part_b_example() {
-        let input: Vec<&str> = clean_input(INPUT).collect();
-
-        let (oxygen, co2, oxygen_co2) = part_b(input);
-
-        assert_eq!(oxygen, 23);
-        assert_eq!(co2, 10);
-        assert_eq!(oxygen_co2, 230);
+    fn test_single_line() {
+        let (part1, part2) = solve("10101").expect("valid input");
+        assert_eq!(part1, 210);
+        assert_eq!(part2, 441);
     }
 
     #[test]
-    fn test_part_b() {
-        let file = read_file("input/day3.txt");
-        let input = clean_input(file.as_str()).collect();
+    fn test_alternating_bits() {
+        let input = "10\n01";
+        let (part1, part2) = solve(input).expect("valid input");
+        assert_eq!(part1, 0);
+        assert_eq!(part2, 2);
+    }
 
-        let (oxygen, co2, oxygen_co2) = part_b(input);
+    #[test]
+    fn test_malformed_empty() {
+        assert!(solve("").is_err(), "empty input should fail");
+    }
 
-        assert_eq!(oxygen, 2349);
-        assert_eq!(co2, 1190);
-        assert_eq!(oxygen_co2, 2795310);
+    #[test]
+    fn test_malformed_non_binary() {
+        assert!(solve("10102").is_err(), "non-binary character should fail");
+    }
+
+    #[test]
+    fn test_malformed_uneven_lines() {
+        assert!(solve("101\n10").is_err(), "uneven line lengths should fail");
     }
 }

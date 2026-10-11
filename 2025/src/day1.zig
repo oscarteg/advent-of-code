@@ -58,12 +58,13 @@ const Rotation = struct {
     }
 };
 
-pub fn main() !void {
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
-    const allocator = arena.allocator();
+pub const Answer = struct {
+    part1: u32,
+    part2: u32,
+};
 
-    const input = try utils.readStdin(allocator);
+pub fn solve(allocator: std.mem.Allocator, input: []const u8) !Answer {
+    _ = allocator;
 
     var position: i32 = 50;
     var part1: u32 = 0;
@@ -85,11 +86,67 @@ pub fn main() !void {
         }
     }
 
-    // Output results
-    var stdout_buffer: [512]u8 = undefined;
-    var stdout_file_writer = std.fs.File.stdout().writer(&stdout_buffer);
-    const stdout = &stdout_file_writer.interface;
-    try stdout.print("Part 1: {d}\n", .{part1});
-    try stdout.print("Part 2: {d}\n", .{part2});
+    return Answer{
+        .part1 = part1,
+        .part2 = part2,
+    };
+}
+
+pub fn main(init: std.process.Init) !void {
+    const arena = init.arena.allocator();
+    var stdin_buffer: [4096]u8 = undefined;
+    var stdin_reader = std.Io.File.stdin().reader(init.io, &stdin_buffer);
+    const input = try stdin_reader.interface.allocRemaining(arena, .unlimited);
+    const answers = try solve(arena, input);
+    var stdout_buffer: [256]u8 = undefined;
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
+    const stdout = &stdout_writer.interface;
+    try stdout.print("Part 1: {d}\nPart 2: {d}\n", .{ answers.part1, answers.part2 });
     try stdout.flush();
+}
+
+test "example input" {
+    const allocator = std.testing.allocator;
+    const input = @embedFile("examples/day1.txt");
+    const answers = try solve(allocator, input);
+    try std.testing.expectEqual(@as(u32, 3), answers.part1);
+    try std.testing.expectEqual(@as(u32, 6), answers.part2);
+}
+
+test "single rotation ending at zero" {
+    const allocator = std.testing.allocator;
+    const input = "R50\n";
+    const answers = try solve(allocator, input);
+    try std.testing.expectEqual(@as(u32, 1), answers.part1);
+    try std.testing.expectEqual(@as(u32, 1), answers.part2);
+}
+
+test "rotation with multiple crossings" {
+    const allocator = std.testing.allocator;
+    const input = "R250\n";
+    const answers = try solve(allocator, input);
+    try std.testing.expectEqual(@as(u32, 1), answers.part1);
+    try std.testing.expectEqual(@as(u32, 3), answers.part2);
+}
+
+test "rotation from zero" {
+    const allocator = std.testing.allocator;
+    const input = "R50\nL50\n";
+    const answers = try solve(allocator, input);
+    try std.testing.expectEqual(@as(u32, 1), answers.part1);
+    try std.testing.expectEqual(@as(u32, 1), answers.part2);
+}
+
+test "malformed input returns error" {
+    const allocator = std.testing.allocator;
+    const input = "X50\n";
+    const result = solve(allocator, input);
+    try std.testing.expectError(error.InvalidDirection, result);
+}
+
+test "missing distance returns error" {
+    const allocator = std.testing.allocator;
+    const input = "L\n";
+    const result = solve(allocator, input);
+    try std.testing.expectError(error.InvalidFormat, result);
 }

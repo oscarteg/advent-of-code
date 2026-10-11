@@ -1,0 +1,4 @@
+[tools]
+go = "latest"
+rust = "latest"
+zig = "latest"
